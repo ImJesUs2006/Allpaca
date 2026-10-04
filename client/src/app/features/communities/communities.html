@@ -1,0 +1,75 @@
+<section class="w-full pt-32 pb-16 px-6 sm:px-12 md:px-20 max-w-[1800px] mx-auto">
+  <div class="flex items-end justify-between border-b-4 border-black pb-4 mb-8 gap-4 flex-wrap">
+    <div>
+      <h1 class="font-display text-4xl sm:text-6xl uppercase tracking-tighter">Comunidades</h1>
+      <p class="font-body font-bold uppercase text-sm tracking-widest opacity-60 mt-2">
+        Colectivos y archivos por estilo
+      </p>
+    </div>
+
+    @if (auth.isAuthenticated()) {
+      <button
+        type="button"
+        (click)="showOnlyMine.set(!showOnlyMine())"
+        class="px-5 py-2 border-4 border-black font-display font-bold uppercase text-sm transition-colors"
+        [class.bg-black]="showOnlyMine()"
+        [class.text-white]="showOnlyMine()"
+      >
+        {{ showOnlyMine() ? 'Ver todas' : 'Las mias' }}
+      </button>
+    }
+  </div>
+
+  @if (error(); as msg) {
+    <p class="border-4 border-black bg-accent px-4 py-3 font-body font-bold uppercase text-sm">
+      {{ msg }}
+    </p>
+  } @else if (loading()) {
+    <p class="font-body font-bold uppercase text-sm opacity-60">Cargando comunidades...</p>
+  } @else if (visible().length === 0) {
+    <p class="border-4 border-black px-4 py-8 font-body font-bold uppercase text-sm text-center">
+      Todavia no te has unido a ninguna comunidad
+    </p>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      @for (community of visible(); track community.id) {
+        <a
+          [routerLink]="['/comunidades', community.id]"
+          class="group flex flex-col border-4 border-black hover:bg-black hover:text-white transition-none"
+        >
+          <div class="relative aspect-[4/3] overflow-hidden border-b-4 border-black bg-black">
+            <img
+              [src]="community.image_url"
+              [alt]="community.name"
+              loading="lazy"
+              class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-none"
+            />
+            <span
+              class="absolute top-3 left-3 bg-white text-black border-2 border-black px-2 py-1 font-body font-bold uppercase text-xs"
+            >
+              {{ community.tag }}
+            </span>
+            @if (community.is_member) {
+              <span
+                class="absolute top-3 right-3 bg-black text-white border-2 border-white px-2 py-1 font-body font-bold uppercase text-xs"
+              >
+                Miembro
+              </span>
+            }
+          </div>
+
+          <div class="p-4 flex flex-col gap-3 flex-1">
+            <h2 class="font-display font-bold text-2xl uppercase">{{ community.name }}</h2>
+            <p class="font-body text-sm opacity-80 line-clamp-3">{{ community.description }}</p>
+
+            <div class="flex gap-4 font-body font-bold uppercase text-xs tracking-wide mt-auto pt-3 border-t-4 border-dashed border-current">
+              <span>{{ community.members_count }} miembros</span>
+              <span>{{ community.drops_today }} drops hoy</span>
+            </div>
+            <p class="font-body text-xs uppercase opacity-60">{{ community.location }}</p>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</section>

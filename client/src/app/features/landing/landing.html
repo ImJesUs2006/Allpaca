@@ -1,0 +1,123 @@
+<!-- HERO — DESIGN.md §5 -->
+<section class="relative w-full h-screen bg-black flex flex-col items-center justify-center overflow-hidden">
+  <div class="absolute inset-0 pointer-events-none">
+    <img
+      src="hero.jpg"
+      alt=""
+      class="w-full h-full object-cover opacity-60 mix-blend-overlay"
+    />
+  </div>
+
+  <div class="relative z-10 flex flex-col items-center justify-center h-full w-full max-w-7xl px-4 pointer-events-none text-center pt-20">
+    <div class="flex flex-col items-center animate-fade-in-up">
+      <h1 class="font-display text-[12vw] leading-none uppercase tracking-tighter text-white">
+        ALLPACA
+      </h1>
+      <p class="font-signature text-6xl sm:text-7xl lg:text-[6rem] text-white tracking-normal mt-2 animate-pulse-slow">
+        Como nuevo
+      </p>
+    </div>
+
+    <!-- Barra de busqueda compacta como transicion hero -> contenido -->
+    <form
+      class="relative z-10 mt-12 w-full max-w-2xl"
+      (submit)="$event.preventDefault()"
+    >
+      <div class="flex items-center bg-white border-4 border-black">
+        <span class="pl-4 text-black flex items-center">
+          <svg lucideSearch [size]="20" [strokeWidth]="2.5"></svg>
+        </span>
+        <input
+          type="search"
+          [value]="query()"
+          (input)="onSearch($event)"
+          placeholder="Buscar prendas, marcas o estilos..."
+          class="flex-1 bg-transparent px-3 py-3 font-body text-sm uppercase focus:outline-none placeholder:text-black/40"
+        />
+        <button
+          type="submit"
+          routerLink="/directorio"
+          [queryParams]="{ q: query() || null }"
+          class="bg-black text-white px-6 py-3 font-display font-bold uppercase text-sm hover:bg-white hover:text-black transition-colors"
+        >
+          Buscar
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- CARRUSEL "Recomendados para ti" — una sola fila, siempre (DESIGN.md §5) -->
+<section class="w-full py-16 px-0 sm:px-12 md:px-20 max-w-[1800px] mx-auto overflow-hidden">
+  <div class="flex justify-between items-center mb-12 mx-6 sm:mx-0 border-b-4 border-black pb-4">
+    <h2 class="font-display text-4xl sm:text-5xl uppercase inline-block">
+      Recomendados para ti
+    </h2>
+    <div class="hidden sm:flex gap-4">
+      <button
+        type="button"
+        (click)="scroll('left')"
+        class="w-12 h-12 flex items-center justify-center border-4 border-black hover:bg-black hover:text-white transition-colors"
+        aria-label="Anterior"
+      >
+        <svg lucideChevronLeft [size]="28" [strokeWidth]="3"></svg>
+      </button>
+      <button
+        type="button"
+        (click)="scroll('right')"
+        class="w-12 h-12 flex items-center justify-center border-4 border-black hover:bg-black hover:text-white transition-colors"
+        aria-label="Siguiente"
+      >
+        <svg lucideChevronRight [size]="28" [strokeWidth]="3"></svg>
+      </button>
+    </div>
+  </div>
+
+  @if (error(); as msg) {
+    <p class="mx-6 sm:mx-0 border-4 border-black bg-accent px-4 py-3 font-body font-bold uppercase text-sm">
+      {{ msg }}
+    </p>
+  } @else if (loading()) {
+    <p class="mx-6 sm:mx-0 font-body font-bold uppercase text-sm opacity-60">Cargando prendas...</p>
+  } @else {
+    <!-- `w-max` + `overflow-x-auto` + `snap-x` garantiza una sola fila a
+         cualquier ancho; nunca se convierte en grid. -->
+    <div #carousel class="w-full overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory scroll-smooth">
+      <div class="flex gap-8 px-6 sm:px-0 w-max">
+        @for (product of featured(); track product.id) {
+          <app-product-card [product]="product" />
+        }
+      </div>
+    </div>
+  }
+</section>
+
+<!-- NEWSLETTER — App.tsx:1992-2013 -->
+<section
+  class="w-full bg-black text-white py-24 px-6 md:px-20 text-center flex flex-col items-center justify-center border-t-4 border-black"
+>
+  <h2 class="font-display text-5xl sm:text-7xl md:text-9xl uppercase mb-8 leading-none tracking-tight">
+    Unete al<br />Movimiento
+  </h2>
+  <form class="w-full max-w-3xl flex flex-col sm:flex-row border-4 border-white" (submit)="$event.preventDefault()">
+    <input
+      type="email"
+      placeholder="TU CORREO ELECTRONICO"
+      class="flex-1 bg-black text-white px-6 py-6 font-display uppercase text-xl focus:outline-none placeholder:opacity-50"
+      required
+    />
+    <button
+      type="submit"
+      class="bg-white text-black border-l-4 border-transparent sm:border-l-white px-12 py-6 font-display uppercase font-bold text-2xl hover:bg-black hover:text-white hover:border-white transition-colors"
+    >
+      Suscribirse
+    </button>
+  </form>
+</section>
+
+<!-- FOOTER — App.tsx:2014-2018 -->
+<footer class="w-full py-8 text-center border-t-4 border-black">
+  <p class="font-body font-bold uppercase tracking-widest text-sm">
+    © 2026 ALLPACA — CIRCULAR STREETWEAR
+  </p>
+</footer>

@@ -1,0 +1,42 @@
+{
+  "name": "figma-make-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "npm --prefix server run dev",
+    "dev:web": "npm --prefix client start",
+    "dev:web:test": "npm --prefix client start -- --port 4300",
+    "dev:legacy": "vite",
+    "build": "npm --prefix client run build",
+    "build:legacy": "vite build",
+    "preview:legacy": "vite preview",
+    "test": "npm --prefix server test",
+    "test:client": "npm --prefix client test",
+    "test:web": "npm run db:test && npm --prefix client run test:web",
+    "smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/smoke.ps1",
+    "e2e": "npm run db:test && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/e2e.ps1",
+    "typecheck": "npm --prefix server run typecheck && npm --prefix client run typecheck",
+    "db:setup": "npm --prefix server run db:setup",
+    "db:reset": "npm --prefix server run db:reset",
+    "db:test": "npm --prefix server run db:test",
+    "format": "oxfmt"
+  },
+  "dependencies": {
+    "lucide-react": "^1.41.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.0",
+    "oxfmt": "^0.2.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^8.0.5"
+  }
+}

@@ -1,0 +1,87 @@
+@if (cart.isOpen()) {
+  <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" (click)="close()"></div>
+
+  <aside
+    class="fixed inset-y-0 right-0 z-50 max-w-md w-full bg-black text-white border-l-8 border-white flex flex-col"
+    role="dialog"
+    aria-label="Carrito"
+  >
+    <header class="flex items-center justify-between p-6 border-b-4 border-white">
+      <h2 class="font-display font-bold text-2xl uppercase">
+        Carrito ({{ cart.count() }})
+      </h2>
+      <button
+        type="button"
+        (click)="close()"
+        class="p-2 border-2 border-transparent hover:border-white transition-transform duration-300 hover:rotate-90"
+        aria-label="Cerrar carrito"
+      >
+        <svg lucideX [size]="28" [strokeWidth]="2.5"></svg>
+      </button>
+    </header>
+
+    @if (feedback(); as fb) {
+      <div
+        class="px-6 py-3 font-body font-bold text-sm uppercase border-b-4"
+        [class.bg-white]="fb.kind === 'ok'"
+        [class.text-black]="fb.kind === 'ok'"
+        [class.bg-accent]="fb.kind === 'error'"
+        [class.text-black]="fb.kind === 'error'"
+      >
+        {{ fb.text }}
+      </div>
+    }
+
+    <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+      @if (cart.items().length === 0) {
+        <p class="font-body uppercase text-sm opacity-70 text-center mt-12">
+          Tu carrito esta vacio
+        </p>
+      }
+
+      @for (item of cart.items(); track item.id) {
+        <div class="flex gap-4 border-2 border-white p-3">
+          <img
+            [src]="item.image_url"
+            [alt]="item.name"
+            class="w-20 h-24 object-cover grayscale border-2 border-white shrink-0"
+          />
+          <div class="flex flex-col justify-between flex-1 min-w-0">
+            <div>
+              <h3 class="font-display font-bold uppercase text-sm truncate">{{ item.name }}</h3>
+              <p class="font-body text-xs uppercase opacity-70">
+                {{ item.size }} · {{ item.condition }}
+              </p>
+            </div>
+            <div class="flex items-center justify-between mt-2">
+              <span class="font-display font-bold text-lg">{{ priceOf(item.price_cents) }}</span>
+              <button
+                type="button"
+                (click)="remove(item.id)"
+                class="font-body text-xs font-bold uppercase underline underline-offset-2 hover:text-accent"
+              >
+                Quitar
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <footer class="p-6 border-t-4 border-white flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <span class="font-body font-bold uppercase text-sm tracking-widest">Total</span>
+        <span class="font-display font-bold text-3xl">{{ currency.format(total()) }}</span>
+      </div>
+
+      <button
+        type="button"
+        (click)="checkout()"
+        [disabled]="busy() || cart.items().length === 0"
+        class="w-full py-4 bg-white text-black border-4 border-white font-display font-bold uppercase text-2xl hover:bg-black hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {{ busy() ? 'Procesando...' : 'Checkout' }}
+      </button>
+    </footer>
+  </aside>
+}

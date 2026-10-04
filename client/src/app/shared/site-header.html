@@ -1,0 +1,186 @@
+<!--
+  Header fijo. Portado de App.tsx:544-652 (Header).
+  DESIGN.md §5 — el header global corrige un bug del prototipo React, que lo
+  renderizaba DENTRO del hero y por eso se Desplazaba mal en movil.
+-->
+<div
+  class="fixed top-0 left-0 right-0 z-40 w-full flex items-center justify-between p-6 transition-colors duration-300"
+  [class.bg-transparent]="!isSolid()"
+  [class.text-white]="!isSolid()"
+  [class.bg-white]="isSolid()"
+  [class.text-black]="isSolid()"
+  [class.border-b-4]="isSolid()"
+  [class.border-black]="isSolid()"
+>
+  <div class="flex items-center gap-6">
+    <a routerLink="/" class="font-display font-bold text-3xl uppercase tracking-tighter">
+      ALLPACA
+    </a>
+
+    <nav class="hidden md:flex items-center gap-6 font-display font-bold">
+      <a
+        routerLink="/directorio"
+        routerLinkActive="underline underline-offset-4 decoration-2"
+        class="hover:underline underline-offset-4 decoration-2 uppercase"
+        >Directorio</a
+      >
+      <a
+        routerLink="/comunidades"
+        routerLinkActive="underline underline-offset-4 decoration-2"
+        class="hover:underline underline-offset-4 decoration-2 uppercase"
+        >Comunidades</a
+      >
+      @if (auth.isAuthenticated()) {
+        <a
+          routerLink="/dashboard"
+          routerLinkActive="underline underline-offset-4 decoration-2"
+          class="hover:underline underline-offset-4 decoration-2 uppercase"
+          >Dashboard</a
+        >
+      }
+
+      <span class="opacity-50 mx-2">|</span>
+
+      <a routerLink="/directorio" [queryParams]="{ category: 'Tops' }" class="hover:underline underline-offset-4 decoration-2">Tops</a>
+      <a routerLink="/directorio" [queryParams]="{ category: 'Bottoms' }" class="hover:underline underline-offset-4 decoration-2">Bottoms</a>
+      <a routerLink="/directorio" [queryParams]="{ category: 'Accesorios' }" class="hover:underline underline-offset-4 decoration-2">Accesorios</a>
+    </nav>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <!-- Buscador desplegable hacia la izquierda (DESIGN.md §5) -->
+    <div class="relative flex items-center">
+      @if (searchOpen()) {
+        <input
+          type="text"
+          placeholder="Buscar prendas, marcas o estilos..."
+          autofocus
+          (keyup.enter)="onSearch($event)"
+          class="absolute right-full mr-2 w-48 sm:w-80 rounded-full border-2 border-current bg-transparent py-2 px-4 text-sm font-body uppercase focus:outline-none placeholder:text-current/50 animate-fade-in-up"
+        />
+      }
+      <button
+        type="button"
+        (click)="toggleSearch()"
+        class="p-2 border-2 border-transparent hover:border-current transition-colors rounded-full"
+        aria-label="Buscar"
+      >
+        <svg lucideSearch [size]="28" [strokeWidth]="2.5"></svg>
+      </button>
+    </div>
+
+    <!-- DESIGN.md §8: selector de divisa (pendiente en el prototipo, implementado aqui) -->
+    <div class="relative hidden sm:block">
+      <button
+        type="button"
+        (click)="toggleCurrency()"
+        class="flex items-center gap-1 p-2 font-body font-bold text-xs uppercase tracking-wide hover:underline underline-offset-4"
+        aria-label="Cambiar divisa"
+      >
+        {{ currency.code() }}
+        <svg lucideChevronDown [size]="14" [strokeWidth]="3"></svg>
+      </button>
+      @if (currencyOpen()) {
+        <div
+          class="absolute right-0 mt-2 bg-white text-black border-4 border-black max-h-80 overflow-y-auto z-50 min-w-24"
+        >
+          @for (code of currencies; track code) {
+            <button
+              type="button"
+              (click)="pickCurrency(code)"
+              class="block w-full text-left px-3 py-2 text-xs font-bold uppercase hover:bg-black hover:text-white"
+              [class.bg-black]="code === currency.code()"
+              [class.text-white]="code === currency.code()"
+            >
+              {{ code }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    @if (auth.isAuthenticated()) {
+      <a
+        routerLink="/perfil"
+        class="p-2 border-2 border-transparent hover:border-current transition-colors rounded-full"
+        aria-label="Perfil"
+      >
+        <svg lucideUser [size]="28" [strokeWidth]="2.5"></svg>
+      </a>
+      <button
+        type="button"
+        (click)="logout()"
+        class="p-2 border-2 border-transparent hover:border-current transition-colors rounded-full"
+        aria-label="Cerrar sesion"
+      >
+        <svg lucideLogOut [size]="28" [strokeWidth]="2.5"></svg>
+      </button>
+    } @else {
+      <a
+        routerLink="/login"
+        class="px-4 py-2 border-4 border-current font-display font-bold uppercase text-sm hover:bg-black hover:text-white transition-colors"
+      >
+        Entrar
+      </a>
+    }
+
+    <button
+      type="button"
+      (click)="cart.toggle()"
+      class="p-2 border-2 border-transparent hover:border-current transition-colors rounded-full relative"
+      aria-label="Carrito"
+    >
+      <svg lucideShoppingCart [size]="28" [strokeWidth]="2.5"></svg>
+      @if (cart.count() > 0) {
+        <span
+          class="absolute -top-1 -right-1 bg-black text-white font-body font-bold text-xs w-6 h-6 flex items-center justify-center rounded-full"
+        >
+          {{ cart.count() }}
+        </span>
+      }
+    </button>
+
+    <button
+      type="button"
+      (click)="toggleMenu()"
+      class="md:hidden p-2 border-2 border-transparent hover:border-current transition-colors rounded-full"
+      aria-label="Menu"
+    >
+      @if (menuOpen()) {
+        <svg lucideX [size]="28" [strokeWidth]="2.5"></svg>
+      } @else {
+        <svg lucideMenu [size]="28" [strokeWidth]="2.5"></svg>
+      }
+    </button>
+  </div>
+</div>
+
+@if (menuOpen()) {
+  <nav
+    class="md:hidden fixed top-24 left-0 right-0 z-40 bg-white text-black border-b-4 border-black flex flex-col font-display font-bold"
+  >
+    <a routerLink="/directorio" class="px-6 py-4 border-b-2 border-black uppercase">Directorio</a>
+    <a routerLink="/comunidades" class="px-6 py-4 border-b-2 border-black uppercase">Comunidades</a>
+    @if (auth.isAuthenticated()) {
+      <a routerLink="/dashboard" class="px-6 py-4 border-b-2 border-black uppercase">Dashboard</a>
+      <a routerLink="/perfil" class="px-6 py-4 border-b-2 border-black uppercase">Perfil</a>
+    }
+    <div class="px-6 py-4 flex flex-wrap gap-3 border-b-2 border-black">
+      @for (code of currencies; track code) {
+        <button
+          type="button"
+          (click)="pickCurrency(code)"
+          class="px-3 py-1 border-2 border-black text-xs font-body font-bold uppercase"
+          [class.bg-black]="code === currency.code()"
+          [class.text-white]="code === currency.code()"
+        >
+          {{ code }}
+        </button>
+      }
+    </div>
+    @if (!auth.isAuthenticated()) {
+      <a routerLink="/login" class="px-6 py-4 uppercase">Entrar</a>
+      <a routerLink="/registro" class="px-6 py-4 uppercase">Crear cuenta</a>
+    }
+  </nav>
+}

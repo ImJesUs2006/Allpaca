@@ -1,0 +1,99 @@
+<section class="w-full pt-32 pb-16 px-6 sm:px-12 md:px-20 max-w-[1800px] mx-auto">
+  @if (auth.user(); as user) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <aside class="border-4 border-black p-6 h-fit">
+        <div class="flex items-center gap-4 mb-6">
+          @if (user.avatar_url) {
+            <img
+              [src]="user.avatar_url"
+              [alt]="user.name"
+              class="w-20 h-20 object-cover grayscale border-4 border-black"
+            />
+          } @else {
+            <div
+              class="w-20 h-20 bg-black text-white flex items-center justify-center font-display text-3xl font-bold border-4 border-black"
+            >
+              {{ user.handle.charAt(0).toUpperCase() }}
+            </div>
+          }
+          <div class="min-w-0">
+            <h1 class="font-display font-bold text-2xl uppercase truncate">{{ user.name }}</h1>
+            <p class="font-body font-bold uppercase text-sm opacity-70">&#64;{{ user.handle }}</p>
+            @if (user.verified) {
+              <span
+                class="inline-block mt-1 bg-black text-white border-2 border-black px-2 py-0.5 font-body font-bold uppercase text-[10px]"
+              >
+                Verificado
+              </span>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 font-body text-sm uppercase pt-6 border-t-4 border-dashed border-black">
+          <p class="opacity-60">{{ user.location || 'Sin ciudad' }}</p>
+          <p class="opacity-60">Rating: {{ user.rating }}</p>
+          <p class="opacity-60">{{ stats().sales }} ventas · {{ stats().purchases }} compras</p>
+        </div>
+
+        <p class="mt-6 font-body text-sm border-l-4 border-black pl-4">
+          {{ user.bio || 'Sin biografia.' }}
+        </p>
+      </aside>
+
+      <div class="lg:col-span-2 border-4 border-black p-6">
+        <h2 class="font-display font-bold text-2xl uppercase border-b-4 border-black pb-4 mb-6">
+          Editar perfil
+        </h2>
+
+        @if (error(); as msg) {
+          <p class="border-4 border-black bg-accent px-4 py-3 font-body font-bold uppercase text-sm mb-6">
+            {{ msg }}
+          </p>
+        }
+        @if (saved()) {
+          <p class="border-4 border-black bg-black text-white px-4 py-3 font-body font-bold uppercase text-sm mb-6">
+            Cambios guardados
+          </p>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="save()" class="flex flex-col gap-4 max-w-lg">
+          <label class="flex flex-col gap-2">
+            <span class="font-body font-bold uppercase text-xs tracking-widest">Nombre</span>
+            <input
+              type="text"
+              formControlName="name"
+              class="border-2 border-black px-4 py-3 font-body focus:outline-none focus:bg-accent"
+            />
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="font-body font-bold uppercase text-xs tracking-widest">Ciudad</span>
+            <input
+              type="text"
+              formControlName="location"
+              placeholder="CDMX, MEX"
+              class="border-2 border-black px-4 py-3 font-body focus:outline-none focus:bg-accent"
+            />
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="font-body font-bold uppercase text-xs tracking-widest">Biografia</span>
+            <textarea
+              formControlName="bio"
+              rows="4"
+              class="border-2 border-black px-4 py-3 font-body focus:outline-none focus:bg-accent resize-none"
+            ></textarea>
+          </label>
+
+          <button
+            type="submit"
+            [disabled]="busy()"
+            class="py-4 px-8 border-4 border-black bg-white font-display font-bold uppercase text-lg hover:bg-black hover:text-white transition-colors disabled:opacity-50 self-start"
+          >
+            {{ busy() ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+</section>

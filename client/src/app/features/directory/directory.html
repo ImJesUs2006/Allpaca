@@ -1,0 +1,109 @@
+<section class="w-full pt-32 pb-16 px-6 sm:px-12 md:px-20 max-w-[1800px] mx-auto">
+  <div class="flex items-end justify-between border-b-4 border-black pb-4 mb-8">
+    <h1 class="font-display text-4xl sm:text-6xl uppercase tracking-tighter">Directorio</h1>
+    <span class="font-body font-bold uppercase text-sm tracking-widest opacity-60">
+      {{ products().length }} prendas
+    </span>
+  </div>
+
+  <!-- Pestanas de categoria (DESIGN.md §7) -->
+  <div class="flex flex-wrap gap-2 mb-8">
+    @for (tab of tabs; track tab.key) {
+      <button
+        type="button"
+        (click)="setTab(tab)"
+        class="px-5 py-2 border-4 border-black font-display font-bold uppercase text-sm transition-colors"
+        [class.bg-black]="activeTab() === tab.key"
+        [class.text-white]="activeTab() === tab.key"
+        [class.bg-white]="activeTab() !== tab.key"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <!-- Sidebar de filtros -->
+    <aside class="lg:col-span-1 flex flex-col gap-8">
+      <div>
+        <h2 class="font-display font-bold uppercase text-sm tracking-widest mb-3">Buscar</h2>
+        <div class="flex items-center border-2 border-black px-3">
+          <svg lucideSearch [size]="16" [strokeWidth]="2.5"></svg>
+          <input
+            type="search"
+            [value]="query()"
+            (input)="query.set($any($event.target).value)"
+            (keyup.enter)="clearFilters()"
+            placeholder="Prenda, marca..."
+            class="w-full py-2 bg-transparent font-body text-sm uppercase focus:outline-none"
+          />
+        </div>
+      </div>
+
+      <div>
+        <h2 class="font-display font-bold uppercase text-sm tracking-widest mb-3">Estilos</h2>
+        <div class="flex flex-wrap gap-2">
+          @for (style of styles; track style) {
+            <button
+              type="button"
+              (click)="toggleStyle(style)"
+              class="px-3 py-1 border-2 border-black font-body font-bold uppercase text-xs transition-colors"
+              [class.bg-black]="activeStyles().includes(style)"
+              [class.text-white]="activeStyles().includes(style)"
+            >
+              {{ style }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div>
+        <h2 class="font-display font-bold uppercase text-sm tracking-widest mb-3">Tallas</h2>
+        <div class="flex flex-wrap gap-2">
+          @for (size of sizes; track size) {
+            <button
+              type="button"
+              (click)="toggleSize(size)"
+              class="px-3 py-1 border-2 border-black font-body font-bold uppercase text-xs transition-colors"
+              [class.bg-black]="activeSizes().includes(size)"
+              [class.text-white]="activeSizes().includes(size)"
+            >
+              {{ size }}
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (filtersActive()) {
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="px-4 py-2 border-4 border-black font-display font-bold uppercase text-xs hover:bg-black hover:text-white transition-colors self-start"
+        >
+          Limpiar filtros
+        </button>
+      }
+    </aside>
+
+    <!-- Grid de resultados -->
+    <div class="lg:col-span-3">
+      @if (error(); as msg) {
+        <p class="border-4 border-black bg-accent px-4 py-3 font-body font-bold uppercase text-sm">
+          {{ msg }}
+        </p>
+      } @else if (loading()) {
+        <p class="font-body font-bold uppercase text-sm opacity-60">Cargando...</p>
+      } @else if (products().length === 0) {
+        <p class="border-4 border-black px-4 py-8 font-body font-bold uppercase text-sm text-center">
+          Ninguna prenda coincide con esos filtros
+        </p>
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          @for (product of products(); track product.id) {
+            <app-product-card [product]="product" />
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,320 @@
+<section class="w-full pt-32 pb-16 px-6 sm:px-12 md:px-20 max-w-[1800px] mx-auto">
+  <h1 class="font-display text-4xl sm:text-6xl uppercase tracking-tighter border-b-4 border-black pb-4 mb-8">
+    Dashboard
+  </h1>
+
+  @if (error(); as msg) {
+    <p class="border-4 border-black bg-accent px-4 py-3 font-body font-bold uppercase text-sm mb-6">
+      {{ msg }}
+    </p>
+  }
+
+  <!-- Resumen (StatCard, DESIGN.md §5) -->
+  @if (summary(); as s) {
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="border-4 border-black p-6">
+        <p class="font-body text-xs tracking-widest uppercase font-bold opacity-60">Ventas</p>
+        <p class="font-display text-4xl md:text-5xl font-bold">{{ money(s.totals.sales_cents) }}</p>
+        <p class="font-body text-xs opacity-60 mt-1">{{ s.totals.sales_count }} pedidos</p>
+      </div>
+      <div class="border-4 border-black p-6">
+        <p class="font-body text-xs tracking-widest uppercase font-bold opacity-60">Compras</p>
+        <p class="font-display text-4xl md:text-5xl font-bold">
+          {{ money(s.totals.purchases_cents) }}
+        </p>
+        <p class="font-body text-xs opacity-60 mt-1">{{ s.totals.purchases_count }} pedidos</p>
+      </div>
+      <div class="border-4 border-black p-6">
+        <p class="font-body text-xs tracking-widest uppercase font-bold opacity-60">Inventario</p>
+        <p class="font-display text-4xl md:text-5xl font-bold">{{ s.totals.inventory_count }}</p>
+        <p class="font-body text-xs opacity-60 mt-1">prendas publicadas</p>
+      </div>
+      <div class="border-4 border-black p-6">
+        <p class="font-body text-xs tracking-widest uppercase font-bold opacity-60">Mensajes</p>
+        <p class="font-display text-4xl md:text-5xl font-bold">{{ unreadTotal() }}</p>
+        <p class="font-body text-xs opacity-60 mt-1">sin leer</p>
+      </div>
+    </div>
+  }
+
+  <!-- Pestañas -->
+  <div class="flex flex-wrap gap-2 mb-8">
+    @for (tab of tabs; track tab) {
+      <button
+        type="button"
+        (click)="activeTab.set(tab)"
+        class="px-5 py-2 border-4 border-black font-display font-bold uppercase text-sm transition-colors"
+        [class.bg-black]="activeTab() === tab"
+        [class.text-white]="activeTab() === tab"
+      >
+        {{ tab }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <p class="font-body font-bold uppercase text-sm opacity-60">Cargando...</p>
+  } @else {
+    <!-- ------------------------------------------------------ INVENTARIO -->
+    @if (activeTab() === 'Inventario') {
+      @if (inventory().length === 0) {
+        <p class="border-4 border-black px-4 py-8 font-body font-bold uppercase text-sm text-center">
+          No has publicado ninguna prenda
+        </p>
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          @for (product of inventory(); track product.id) {
+            <div class="border-4 border-black p-2 flex gap-4">
+              <img
+                [src]="product.image_url"
+                [alt]="product.name"
+                loading="lazy"
+                class="w-24 h-32 object-cover grayscale border-2 border-black shrink-0"
+              />
+              <div class="flex flex-col justify-between min-w-0">
+                <h3 class="font-display font-bold uppercase text-sm truncate">{{ product.name }}</h3>
+                <p class="font-body text-xs uppercase opacity-70">
+                  {{ product.size }} · {{ product.condition }}
+                </p>
+                <p class="font-body text-xs uppercase opacity-70">{{ product.location }}</p>
+                <p class="font-display font-bold text-xl">{{ money(product.price_cents) }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- -------------------------------------------------- MIS COMPRAS -->
+    @if (activeTab() === 'Mis Compras') {
+      @if (purchases().length === 0) {
+        <p class="border-4 border-black px-4 py-8 font-body font-bold uppercase text-sm text-center">
+          Todavia no has comprado nada
+        </p>
+      } @else {
+        <div class="flex flex-col gap-3">
+          @for (order of purchases(); track order.id) {
+            <div class="border-4 border-black p-4 flex items-center gap-4 flex-wrap">
+              <img
+                [src]="order.product_image"
+                [alt]="order.product_name"
+                loading="lazy"
+                class="w-16 h-20 object-cover grayscale border-2 border-black shrink-0"
+              />
+              <div class="flex-1 min-w-40">
+                <p class="font-body font-bold uppercase text-xs tracking-widest opacity-60">
+                  {{ order.code }}
+                </p>
+                <h3 class="font-display font-bold uppercase">{{ order.product_name }}</h3>
+                <p class="font-body text-xs uppercase opacity-70">
+                  Vendedor: {{ order.counterparty }}
+                  @if (order.tracking) {
+                    · Guia: {{ order.tracking }}
+                  }
+                </p>
+              </div>
+              <div class="flex items-center gap-4">
+                <app-status-badge [status]="order.status" />
+                <span class="font-display font-bold text-2xl">{{ money(order.amount_cents) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- ---------------------------------------------------- MIS VENTAS -->
+    @if (activeTab() === 'Mis Ventas') {
+      @if (sales().length === 0) {
+        <p class="border-4 border-black px-4 py-8 font-body font-bold uppercase text-sm text-center">
+          Todavia no has vendido nada
+        </p>
+      } @else {
+        <div class="flex flex-col gap-3">
+          @for (order of sales(); track order.id) {
+            <div class="border-4 border-black p-4 flex items-center gap-4 flex-wrap">
+              <img
+                [src]="order.product_image"
+                [alt]="order.product_name"
+                loading="lazy"
+                class="w-16 h-20 object-cover grayscale border-2 border-black shrink-0"
+              />
+              <div class="flex-1 min-w-40">
+                <p class="font-body font-bold uppercase text-xs tracking-widest opacity-60">
+                  {{ order.code }}
+                </p>
+                <h3 class="font-display font-bold uppercase">{{ order.product_name }}</h3>
+                <p class="font-body text-xs uppercase opacity-70">
+                  Comprador: {{ order.counterparty }}
+                </p>
+              </div>
+              <div class="flex items-center gap-4">
+                <app-status-badge [status]="order.status" />
+                <span class="font-display font-bold text-2xl">{{ money(order.amount_cents) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- ------------------------------------------------------ MENSAJES -->
+    @if (activeTab() === 'Mensajes') {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="border-4 border-black flex flex-col">
+          <p class="font-display font-bold uppercase p-4 border-b-4 border-black">Conversaciones</p>
+          <div class="flex flex-col max-h-96 overflow-y-auto">
+            @for (conversation of conversations(); track conversation.id) {
+              <button
+                type="button"
+                (click)="openConversation(conversation.id)"
+                class="text-left p-4 border-b-2 border-black transition-colors hover:bg-black hover:text-white flex items-center justify-between gap-2"
+                [class.bg-black]="activeConversation() === conversation.id"
+                [class.text-white]="activeConversation() === conversation.id"
+              >
+                <div class="min-w-0">
+                  <p class="font-display font-bold uppercase text-sm truncate">
+                    {{ conversation.user }}
+                  </p>
+                  <p class="font-body text-xs uppercase opacity-70 truncate">
+                    {{ conversation.about ?? 'Sin producto' }}
+                  </p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="font-body text-xs opacity-60">{{ conversation.last_time }}</span>
+                  @if (conversation.unread > 0) {
+                    <span
+                      class="bg-accent text-black border-2 border-current px-2 py-0.5 font-body font-bold text-xs"
+                    >
+                      {{ conversation.unread }}
+                    </span>
+                  }
+                </div>
+              </button>
+            } @empty {
+              <p class="p-4 font-body text-xs uppercase opacity-60">Sin conversaciones</p>
+            }
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 border-4 border-black flex flex-col min-h-96">
+          @if (activeConversation() === null) {
+            <p class="p-8 font-body text-sm uppercase opacity-60 text-center mt-16">
+              Elige una conversacion
+            </p>
+          } @else {
+            <div class="flex-1 flex flex-col gap-3 p-4 overflow-y-auto max-h-96">
+              @for (message of thread(); track message.id) {
+                <div class="flex" [class.justify-end]="message.from === 'me'">
+                  <div
+                    class="max-w-[75%] px-4 py-2 border-2 font-body text-sm"
+                    [class.bg-black]="message.from === 'me'"
+                    [class.text-white]="message.from === 'me'"
+                    [class.border-black]="message.from === 'me'"
+                    [class.bg-white]="message.from === 'them'"
+                    [class.text-black]="message.from === 'them'"
+                  >
+                    <p>{{ message.body }}</p>
+                    <p class="text-[10px] uppercase opacity-60 mt-1 text-right">{{ message.time }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <form class="flex gap-2 p-4 border-t-4 border-black" (submit)="$event.preventDefault(); send()">
+              <input
+                type="text"
+                [value]="draft()"
+                (input)="draft.set($any($event.target).value)"
+                placeholder="Escribe un mensaje..."
+                class="flex-1 border-2 border-black px-3 py-2 font-body text-sm focus:outline-none"
+              />
+              <button
+                type="submit"
+                class="px-5 py-2 bg-black text-white border-4 border-black font-display font-bold uppercase text-sm hover:bg-white hover:text-black transition-colors flex items-center gap-2"
+              >
+                <svg lucideSend [size]="16" [strokeWidth]="2.5"></svg>
+                Enviar
+              </button>
+            </form>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- --------------------------------------------------- ANALITICAS -->
+    @if (activeTab() === 'Analiticas') {
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="border-4 border-black p-6">
+          <h2 class="font-display font-bold text-2xl uppercase border-b-4 border-black pb-2 mb-6">
+            Ingresos por mes
+          </h2>
+          <div class="flex items-end gap-3 h-48">
+            @for (month of summary()?.monthly ?? []; track month.month) {
+              <div class="flex-1 flex flex-col items-center gap-2">
+                <div
+                  class="w-full bg-black border-2 border-black"
+                  [style.height.%]="(month.revenue_cents / maxRevenue()) * 100"
+                  [title]="money(month.revenue_cents)"
+                ></div>
+                <span class="font-body text-[10px] font-bold uppercase opacity-70">
+                  {{ monthLabel(month.month) }}
+                </span>
+              </div>
+            } @empty {
+              <p class="font-body text-xs uppercase opacity-60">Sin datos</p>
+            }
+          </div>
+        </div>
+
+        <div class="border-4 border-black p-6">
+          <h2 class="font-display font-bold text-2xl uppercase border-b-4 border-black pb-2 mb-6">
+            Trafico
+          </h2>
+          <div class="flex flex-col gap-4">
+            @for (source of summary()?.traffic ?? []; track source.source) {
+              <div>
+                <div class="flex justify-between font-body text-xs font-bold uppercase mb-1">
+                  <span>{{ source.source }}</span>
+                  <span class="opacity-60">{{ source.visits }}</span>
+                </div>
+                <div class="h-4 border-2 border-black">
+                  <div
+                    class="h-full bg-black"
+                    [style.width.%]="(source.visits / maxTraffic()) * 100"
+                  ></div>
+                </div>
+              </div>
+            } @empty {
+              <p class="font-body text-xs uppercase opacity-60">Sin datos</p>
+            }
+          </div>
+        </div>
+
+        <div class="border-4 border-black p-6 lg:col-span-2">
+          <h2 class="font-display font-bold text-2xl uppercase border-b-4 border-black pb-2 mb-6">
+            Prendas mas vendidas
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            @for (product of summary()?.topProducts ?? []; track product.name) {
+              <div class="border-2 border-black p-3 flex items-center gap-3">
+                <img
+                  [src]="product.image_url"
+                  [alt]="product.name"
+                  loading="lazy"
+                  class="w-14 h-18 object-cover grayscale border-2 border-black"
+                />
+                <div>
+                  <p class="font-display font-bold uppercase text-sm truncate">{{ product.name }}</p>
+                  <p class="font-body text-xs uppercase opacity-70">{{ product.units }} unidades</p>
+                </div>
+              </div>
+            } @empty {
+              <p class="font-body text-xs uppercase opacity-60">Sin datos</p>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  }
+</section>

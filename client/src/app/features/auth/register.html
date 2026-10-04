@@ -1,0 +1,120 @@
+<div class="min-h-screen bg-black text-white flex flex-col">
+  <div class="flex-1 flex items-center justify-center px-6 py-24">
+    <div class="w-full max-w-md">
+      <a
+        routerLink="/login"
+        class="inline-flex items-center gap-2 font-body font-bold uppercase text-xs tracking-widest opacity-70 hover:opacity-100 mb-8"
+      >
+        <svg lucideArrowLeft [size]="16" [strokeWidth]="3"></svg>
+        Volver al inicio de sesion
+      </a>
+
+      <h1 class="font-display font-bold text-5xl uppercase tracking-tighter mb-2">ALLPACA</h1>
+      <h2 class="font-display font-bold text-2xl uppercase mb-8">Crear cuenta</h2>
+
+      <p class="font-body text-sm uppercase opacity-70 mb-6 border-l-4 border-accent pl-4">
+        Una sola cuenta para comprar y para vender. Sin explorador ni dealer.
+      </p>
+
+      @if (error(); as msg) {
+        <div
+          class="bg-accent text-black border-4 border-white px-4 py-3 font-body font-bold text-sm uppercase mb-6"
+          role="alert"
+        >
+          {{ msg }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+        <label class="flex flex-col gap-2">
+          <span class="font-body font-bold uppercase text-xs tracking-widest opacity-80">Nombre</span>
+          <input
+            type="text"
+            formControlName="name"
+            class="bg-transparent border-2 border-white px-4 py-3 font-body text-white focus:outline-none focus:border-accent"
+          />
+        </label>
+
+        <label class="flex flex-col gap-2">
+          <span class="font-body font-bold uppercase text-xs tracking-widest opacity-80">Usuario</span>
+          <input
+            type="text"
+            formControlName="handle"
+            placeholder="sin arroba"
+            class="bg-transparent border-2 border-white px-4 py-3 font-body text-white placeholder:text-white/40 focus:outline-none focus:border-accent"
+          />
+          @if (form.controls.handle.touched && form.controls.handle.invalid) {
+            <span class="font-body text-xs uppercase text-accent">
+              Minimo 3 caracteres. Solo letras, numeros, punto y guion bajo.
+            </span>
+          }
+        </label>
+
+        <label class="flex flex-col gap-2">
+          <span class="font-body font-bold uppercase text-xs tracking-widest opacity-80">Ciudad</span>
+          <input
+            type="text"
+            formControlName="location"
+            placeholder="CDMX, MEX"
+            class="bg-transparent border-2 border-white px-4 py-3 font-body text-white placeholder:text-white/40 focus:outline-none focus:border-accent"
+          />
+        </label>
+
+        <label class="flex flex-col gap-2">
+          <span class="font-body font-bold uppercase text-xs tracking-widest opacity-80">Correo</span>
+          <input
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            class="bg-transparent border-2 border-white px-4 py-3 font-body text-white focus:outline-none focus:border-accent"
+          />
+        </label>
+
+        <label class="flex flex-col gap-2">
+          <span class="font-body font-bold uppercase text-xs tracking-widest opacity-80">Contrasena</span>
+          <input
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            class="bg-transparent border-2 border-white px-4 py-3 font-body text-white focus:outline-none focus:border-accent"
+          />
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <span class="font-body text-xs uppercase text-accent">Minimo 8 caracteres</span>
+          }
+        </label>
+
+        <label class="flex flex-col gap-2">
+          <span class="font-body font-bold uppercase text-xs tracking-widest opacity-80">
+            Repetir contrasena
+          </span>
+          <input
+            type="password"
+            formControlName="confirm"
+            autocomplete="new-password"
+            class="bg-transparent border-2 border-white px-4 py-3 font-body text-white focus:outline-none focus:border-accent"
+          />
+        </label>
+
+        <button
+          type="submit"
+          [disabled]="busy()"
+          class="mt-2 w-full py-4 bg-white text-black border-4 border-white font-display font-bold uppercase text-xl hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+        >
+          @if (busy()) {
+            <svg lucideLoader [size]="20" [strokeWidth]="3"></svg>
+            Creando
+          } @else {
+            Crear cuenta
+          }
+        </button>
+      </form>
+
+      <p class="mt-8 font-body text-sm uppercase opacity-70">
+        Ya tienes cuenta?
+        <a routerLink="/login" class="text-accent font-bold underline underline-offset-4">
+          Entrar
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

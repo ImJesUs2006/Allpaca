@@ -1,0 +1,113 @@
+/*
+ * ALLPACA — tokens de diseño.
+ * Portado 1:1 desde src/index.css del prototipo React.
+ * Fuente de verdad: DESIGN.md (secciones 1, 2, 3 y 6).
+ * NO cambiar valores sin actualizar DESIGN.md.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Manrope:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+@import 'tailwindcss';
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --font-display: "Syne", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-signature: "Caveat", cursive;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #f4f4f5;
+  --card-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --muted: #e4e4e7;
+  --muted-foreground: #71717a;
+  --border: #000000;
+  --accent: #ffff00;
+  --accent-foreground: #000000;
+}
+
+/*
+ * DESIGN.md §1: el tema `.dark` esta definido pero la app se renderiza
+ * siempre en claro. Se conserva por paridad con el prototipo.
+ */
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #18181b;
+  --card-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --border: #ffffff;
+  --accent: #ffff00;
+  --accent-foreground: #000000;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: var(--font-body);
+}
+
+body {
+  background-color: rgb(255, 255, 255);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------
+ * Animaciones — DESIGN.md §6.
+ * En el React iban inyectadas con un <style> dentro de App.tsx;
+ * aqui viven en CSS global como indicaba la propia spec.
+ * ------------------------------------------------------------- */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1s ease-out both;
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s infinite;
+}
+
+/* Carrusel "Recomendados para ti" (DESIGN.md §5). */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

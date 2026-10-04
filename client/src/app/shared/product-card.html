@@ -1,0 +1,58 @@
+<article
+  class="group flex flex-col border-4 border-black p-2 cursor-pointer transition-none min-w-[280px] sm:min-w-[320px] max-w-[320px] shrink-0 snap-start hover:bg-black hover:text-white"
+>
+  <div class="relative aspect-[3/4] w-full overflow-hidden border-4 border-black mb-4 bg-black">
+    <img
+      [src]="product().image_url"
+      [alt]="product().name"
+      loading="lazy"
+      class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-none"
+    />
+
+    @if (product().verified) {
+      <span
+        class="absolute top-2 right-2 bg-white text-black border-2 border-black p-1 flex items-center"
+        title="Vendedor verificado"
+      >
+        <svg lucideCheck [size]="16" [strokeWidth]="3"></svg>
+      </span>
+    }
+  </div>
+
+  <div class="flex flex-col gap-2 p-1">
+    <h3 class="font-display font-bold text-xl uppercase leading-tight truncate">
+      {{ product().name }}
+    </h3>
+
+    <div class="font-body text-xs font-semibold flex flex-wrap gap-2 uppercase tracking-wide">
+      <span class="border-2 border-black px-2 py-1">{{ product().category }}</span>
+      <span class="border-2 border-black px-2 py-1">Size: {{ product().size }}</span>
+      <span class="border-2 border-black px-2 py-1">{{ product().condition }}</span>
+    </div>
+
+    <div class="flex items-center gap-1 font-body text-xs uppercase font-bold mt-1">
+      <svg lucideMapPin [size]="12" [strokeWidth]="2.5"></svg>
+      {{ product().location }}
+    </div>
+
+    <div class="flex justify-between items-center mt-2 border-t-4 border-dashed border-current pt-2">
+      <div class="flex flex-col">
+        <span class="font-body font-bold">{{ product().seller }}</span>
+        <span class="font-body text-sm flex items-center gap-1">
+          <svg lucideStar [size]="12" [strokeWidth]="2.5"></svg>
+          {{ product().rating }}
+        </span>
+      </div>
+      <span class="font-display text-3xl font-bold">{{ price() }}</span>
+    </div>
+
+    <button
+      type="button"
+      (click)="addToCart($event)"
+      class="mt-2 w-full py-2 border-4 border-black font-display font-bold uppercase text-sm flex items-center justify-center gap-2 transition-colors hover:bg-white hover:text-black"
+    >
+      <svg lucideShoppingCart [size]="16" [strokeWidth]="2.5"></svg>
+      {{ inCart() ? 'En el carrito' : 'Agregar' }}
+    </button>
+  </div>
+</article>

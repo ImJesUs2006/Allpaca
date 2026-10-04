@@ -1,0 +1,10 @@
+{
+  "description": "Discover trendy second-hand clothing with a bold, youth-oriented interface featuring easy navigation, personalized recommendations, and a streamlined search experience.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

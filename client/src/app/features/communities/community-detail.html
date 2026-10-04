@@ -1,0 +1,102 @@
+@if (loading()) {
+  <section class="pt-32 pb-16 px-6 sm:px-12 md:px-20">
+    <p class="font-body font-bold uppercase text-sm opacity-60">Cargando comunidad...</p>
+  </section>
+} @else if (error(); as msg) {
+  <section class="pt-32 pb-16 px-6 sm:px-12 md:px-20 max-w-[1800px] mx-auto">
+    <p class="border-4 border-black bg-accent px-4 py-3 font-body font-bold uppercase text-sm">
+      {{ msg }}
+    </p>
+    <a routerLink="/comunidades" class="inline-block mt-6 font-display font-bold uppercase underline underline-offset-4">
+      Volver a comunidades
+    </a>
+  </section>
+} @else if (community(); as c) {
+  <section class="w-full pt-32 pb-16 px-6 sm:px-12 md:px-20 max-w-[1800px] mx-auto">
+    <a
+      routerLink="/comunidades"
+      class="inline-flex items-center gap-2 font-body font-bold uppercase text-xs tracking-widest opacity-70 hover:opacity-100 mb-8"
+    >
+      <svg lucideArrowLeft [size]="16" [strokeWidth]="3"></svg>
+      Comunidades
+    </a>
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+      <div class="lg:col-span-3">
+        <div class="relative aspect-[16/9] overflow-hidden border-4 border-black bg-black">
+          <img [src]="c.image_url" [alt]="c.name" class="w-full h-full object-cover grayscale" />
+          <span
+            class="absolute top-4 left-4 bg-white text-black border-2 border-black px-3 py-1 font-body font-bold uppercase text-xs"
+          >
+            {{ c.tag }}
+          </span>
+        </div>
+
+        <h1 class="font-display font-bold text-4xl sm:text-6xl uppercase tracking-tighter mt-6">
+          {{ c.name }}
+        </h1>
+        <p class="font-body text-base mt-4 max-w-2xl">{{ c.description }}</p>
+
+        <div class="flex flex-wrap gap-6 font-body font-bold uppercase text-xs tracking-wide mt-6 pt-6 border-t-4 border-dashed border-black">
+          <span>{{ c.members_count }} miembros</span>
+          <span>{{ c.drops_today }} drops hoy</span>
+          <span>{{ c.location }}</span>
+          <span>Curada por {{ c.curator }}</span>
+        </div>
+
+        <div class="mt-8">
+          <h2 class="font-display font-bold text-2xl uppercase mb-4">Reglas</h2>
+          <ol class="flex flex-col gap-3">
+            @for (rule of c.rules; track rule) {
+              <li class="flex gap-3 font-body text-sm">
+                <span class="font-display font-bold shrink-0">{{ $index + 1 }}.</span>
+                <span>{{ rule }}</span>
+              </li>
+            }
+          </ol>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 flex flex-col gap-8">
+        <button
+          type="button"
+          (click)="toggleJoin()"
+          [disabled]="busy()"
+          class="w-full py-4 border-4 border-black font-display font-bold uppercase text-xl transition-colors hover:bg-black hover:text-white disabled:opacity-50"
+          [class.bg-white]="!c.is_member"
+          [class.bg-black]="c.is_member"
+          [class.text-white]="c.is_member"
+        >
+          {{ c.is_member ? 'Abandonar comunidad' : 'Unirme a la comunidad' }}
+        </button>
+
+        <div>
+          <h2 class="font-display font-bold text-2xl uppercase mb-4 border-b-4 border-black pb-2">
+            Miembros
+          </h2>
+          <ul class="flex flex-col gap-3">
+            @for (member of c.members; track member.user) {
+              <li class="flex items-center justify-between font-body text-sm uppercase">
+                <span class="font-bold">{{ member.user }}</span>
+                <span class="opacity-60">{{ member.role }} · {{ member.drops }} drops</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    @if (drops().length > 0) {
+      <div class="mt-16">
+        <h2 class="font-display text-4xl uppercase border-b-4 border-black pb-4 mb-8">
+          Drops de la comunidad
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          @for (product of drops(); track product.id) {
+            <app-product-card [product]="product" />
+          }
+        </div>
+      </div>
+    }
+  </section>
+}
